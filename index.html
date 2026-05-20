@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Alignment-Guided Score Matching for Text-to-Image Alignment in Diffusion Models">
+  <meta property="og:title" content="Alignment-Guided Score Matching">
+  <meta property="og:description" content="A reward-free soft-token post-training method for improving text-to-image alignment in diffusion models.">
+  <meta property="og:image" content="static/images/representative.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="keywords" content="text-to-image generation, diffusion models, score matching, alignment, soft tokens">
+
+  <title>Alignment-Guided Score Matching</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="static/css/index.css?v=light-theme">
+
+  <script>
+    window.MathJax = {
+      tex2jax: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+  </script>
+  <script defer src="static/js/copy2clipboard.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="publication-title">
+          <span class="title-line gradient-text title-gradient">Alignment-Guided Score Matching</span>
+          <span class="title-line title-subline">for Text-to-Image Alignment in Diffusion Models</span>
+        </h1>
+
+        <div class="publication-authors">
+          <span class="author-block"><a href="https://scholar.google.com/citations?user=Lw7R3sMAAAAJ&hl=ko" target="_blank" rel="noopener">Jaa-Yeon Lee</a><sup>1,*</sup></span>
+          <span class="author-block"><a href="https://yeobinhong.github.io/" target="_blank" rel="noopener">Yeobin Hong</a><sup>1,*</sup></span>
+          <span class="author-block"><a href="https://star-kwon.github.io/" target="_blank" rel="noopener">Taesung Kwon</a><sup>1</sup></span>
+          <span class="author-block"><a href="https://bispl.weebly.com/professor.html" target="_blank" rel="noopener">Jong Chul Ye</a><sup>1</sup></span>
+        </div>
+
+        <div class="affiliations">
+          <sup>*</sup>Equal contribution
+          <br>
+          <sup>1</sup>KAIST
+        </div>
+
+        <div class="venue">ICML 2026 (Spotlight)</div>
+
+        <div class="btn-group">
+          <a class="btn" href="#" aria-label="Paper link placeholder">
+            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+            <span>Paper (Coming soon)</span>
+          </a>
+          <a class="btn" href="https://github.com/jaayeon/AGSM" target="_blank" rel="noopener" aria-label="Code repository">
+            <i class="fab fa-github" aria-hidden="true"></i>
+            <span>Code (Coming soon)</span>
+          </a>
+          <a class="btn" href="#BibTeX">
+            <i class="ai ai-google-scholar" aria-hidden="true"></i>
+            <span>BibTeX</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt" id="tldr">
+      <div class="container">
+        <h2 class="section-title">TL;DR</h2>
+        <p class="tldr">
+          <span class="gradient-text">AGSM</span> is a lightweight, reward-free post-training method that improves text-image alignment in diffusion models.
+          The key design is a dual-token architecture that separates positive and negative alignment guidance during training.
+          AGSM improves semantic faithfulness, reduces counting errors, works across multiple backbones, and is complementary to RL post-training methods.
+        </p>
+      </div>
+    </section>
+
+    <section id="contributions">
+      <div class="container">
+        <h2 class="section-title">Key Contributions</h2>
+        <ul class="contribution-list">
+          <li class="contribution-item">
+            <strong>Reward-free Plackett-Luce formulation.</strong> AGSM models text-image alignment as preference
+            learning over diffusion scores, avoiding external reward models.
+          </li>
+          <li class="contribution-item">
+            <strong>Explicit negative guidance.</strong> The method avoids unbounded contrastive divergence by
+            assigning bounded score-level directions to negative pairs.
+          </li>
+          <li class="contribution-item">
+            <strong>Dual token architecture.</strong>
+            AGSM separates positive and negative alignment regions with \(\psi^+\) and \(\psi^-\), preventing conflicting gradients from being absorbed into one shared token space.
+          </li>
+          <li class="contribution-item">
+            <strong>Efficiency and Versatility.</strong>
+            AGSM optimizes a small set of soft tokens (1.8M), works across multiple diffusion backbones, and can be combined with diffusion-RL post-training methods.
+          </li>
+
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-alt" id="method">
+      <div class="container">
+        <h2 class="section-title">Method Overview</h2>
+        <p class="content-text">
+          <span class="gradient-text">AGSM</span> treats text-image alignment as a reward-free preference problem inside the diffusion score-matching objective. 
+          It first estimates an intrinsic alignment reward from denoising likelihood, normalizes text candidates with a Plackett–Luce model, and then modifies the score-matching target with bounded alignment guidance.
+        </p>
+
+        <div class="media-block">
+          <img class="media-image" src="static/images/main.jpg" alt="Overview diagram of Alignment-Guided Score Matching with positive and negative soft-token guidance">
+        </div>
+        <p class="figure-caption">
+          AGSM increases alignment rewards for positive pairs and decreasing those for negative pairs. 
+          $\epsilon_\theta^+$, $\epsilon_\theta^-$ are conditioned on positive, negative soft tokens $(\psi^+, \psi^-)$. 
+          Target noise is adjusted using alignment guidance derived from implicit-reward–weighted EMA predictions $(\hat\epsilon_\theta^+, \hat\epsilon_\theta^-)$. 
+          <!-- For clarity, the figure shows a single negative pair, while multiple negatives are used during training. -->
+        </p>
+
+        <div class="method-grid">
+          <article class="method-card">
+            <h3>From Contrastive Pushes<a href="#ref-softrepa">[1]</a> to Score Guidance</h3>
+            <ul>
+              <li><strong>Reward-free alignment signal.</strong> Derive alignment rewards from the diffusion model’s own denoising likelihood, without external reward models.</li>
+              <li><strong>Normalized preference guidance.</strong> Use a Plackett-Luce formulation to model alignment probabilities.</li>
+              <li><strong>Target-level score correction.</strong> Shift the score-matching target rather than directly maximizing negative pairs' denoising errors.</li>
+            </ul>
+          </article>
+          <article class="method-card">
+            <h3>Dual Soft Tokens</h3>
+            <ul>
+              <li><strong>Architectural separation.</strong> \(\psi^+\) and \(\psi^-\) decouple positive and negative alignment regions.</li>
+              <li><strong>Cleaner loss design.</strong> The split objective assigns separate score-matching targets to positive and negative pairs, enabling bounded negative guidance instead of over-optimizing negative pairs.</li>
+              <li><strong>Ablation-backed benefit.</strong> With the same total token budget, the dual-token design outperforms positive-only and shared-token variants on alignment metrics.</li>
+            </ul>
+          </article>
+        </div>
+
+        <!-- <div class="equation-row" aria-label="Method equation summaries">
+          <div class="equation">\[
+            p(z \mid x_t, c) =
+            \frac{\exp(r(x_t, c))}{\sum_i \exp(r(x_t, c_i))}
+          \]</div>
+          <div class="equation">\[
+            \begin{aligned}
+            \min_{\psi^+, \psi^-}\Big(
+            &\mathbb{E}_{(x,c)\sim\mathcal{D}^+}
+            \left[
+            \left\|
+            \epsilon^{\psi^+}_{t,\theta}
+            -
+            \left(\epsilon_t + \gamma^+\tilde{A}(t)\Delta_{\hat{\psi}_z}\right)
+            \right\|_2^2
+            \right] \\
+            &+
+            \mathbb{E}_{(x,c)\sim\mathcal{D}^-}
+            \left[
+            \left\|
+            \epsilon^{\psi^-}_{t,\theta}
+            -
+            \left(\epsilon_t - \gamma^-\tilde{A}(t)\Delta_{\hat{\psi}_z}\right)
+            \right\|_2^2
+            \right]\Big)
+            \end{aligned}
+          \]</div>
+        </div> -->
+      </div>
+    </section>
+
+
+    <section id="generation">
+      <div class="container-wide">
+        <h2 class="section-title">Text-to-Image Generation</h2>
+        <p class="content-text">
+          <span class="gradient-text">AGSM</span> improves text-image alignment across SD1.5, SDXL, and SD3 while keeping image quality competitive.
+        </p>
+
+        <!-- <div class="media-block">
+          <img class="media-image flat" src="static/images/training_dynamics_analysis.jpg" alt="Training stability comparison between AGSM and SoftREPA">
+        </div>
+        <p class="figure-caption">
+          Training stability comparison between AGSM and SoftREPA. SoftREPA's validation
+          ImageReward degrades despite decreasing training loss, while AGSM remains stable throughout later training.
+        </p> -->
+
+        <div class="media-block">
+          <img class="media-image flat comparison-graph" src="static/images/comparison_graph.jpg" alt="ImageReward versus FID plot comparing baseline, SoftREPA, and AGSM for generation">
+        </div>
+        <p class="figure-caption">
+          AGSM achieves a better Pareto frontier across complementary metrics (top-left) for both image generation and editing.
+        </p>
+
+        <div class="media-block">
+          <img class="media-image" src="static/images/qualitative_generation.jpg" alt="Qualitative generation comparisons between SD3, SoftREPA, and AGSM">
+        </div>
+        <p class="figure-caption">
+          AGSM follows the prompt more faithfully and avoids repeated objects more often than SoftREPA.
+        </p>        
+
+      </div>
+    </section>
+
+    <section class="section-alt" id="editing">
+      <div class="container-wide">
+        <h2 class="section-title">Text-Guided Image Editing</h2>
+        <p class="content-text">
+          <span class="gradient-text">AGSM</span> improves target-text alignment for image editing while preserving the source image structure.
+        </p>
+
+        <div class="media-block">
+          <img class="media-image" src="static/images/qualitative_editing_srt.jpg" alt="Qualitative image editing comparisons between baseline methods, SoftREPA, and AGSM">
+        </div>
+        <p class="figure-caption">
+          AGSM demonstrates a superior balance between text alignment and structural consistency.
+        </p>
+
+      </div>
+    </section>
+
+    <section id="rl">
+      <div class="container-wide">
+        <h2 class="section-title">Complementary to Diffusion RL</h2>
+        <p class="content-text">
+          <span class="gradient-text">AGSM</span> can be combined with existing preference optimization methods. Adding AGSM to
+          DiffusionDPO<a href="#ref-diffusiondpo">[2]</a>,
+          SPO<a href="#ref-spo">[3]</a>, and InPO<a href="#ref-inpo">[4]</a>
+          improves COCO val5K metrics on SD1.5 and SDXL.
+        </p>
+
+        <div class="media-block">
+          <img class="media-image" src="static/images/supple_qualitative_coco.jpg" alt="Additional qualitative generation comparisons with diffusion RL methods">
+        </div>
+        <p class="figure-caption">
+          AGSM improves prompt fidelity when added to diffusion RL methods.
+        </p>
+
+      </div>
+    </section>
+
+
+    <section class="section-alt" id="BibTeX">
+      <div class="container references-block">
+        <h2 class="section-title">References</h2>
+        <p>
+          <a id="ref-softrepa" href="#ref-softrepa">[1]</a>
+          Lee et al.,
+          <em>Aligning Text to Image in Diffusion Models is Easier Than You Think</em>.
+        </p>
+        <p>
+          <a id="ref-diffusiondpo" href="#ref-diffusiondpo">[2]</a>
+          Wallace et al.,
+          <em>Diffusion Model Alignment Using Direct Preference Optimization</em>.
+        </p>
+        <p>
+          <a id="ref-spo" href="#ref-spo">[3]</a>
+          Liang et al.,
+          <em>Aesthetic Post-Training Diffusion Models from Generic Preferences with Step-by-Step Preference Optimization</em>.
+        </p>
+        <p>
+          <a id="ref-inpo" href="#ref-inpo">[4]</a>
+          Lu et al.,
+          <em>InPO: Inversion Preference Optimization with Reparametrized DDIM for Efficient Diffusion Model Alignment</em>.
+        </p>
+      </div>
+
+      
+      <div class="container">
+        <h2 class="section-title">BibTeX</h2>
+        <div class="bibtex-container">
+          <button id="copyButton" type="button" onclick="copyBibtex()">Copy</button>
+          <pre id="bibtexContent"> <!-- @inproceedings{lee2026agsm, -->
+  <!-- title={Alignment-Guided Score Matching for Text-to-Image Alignment in Diffusion Models},
+  author={Lee, Jaa-Yeon and Hong, Yeobin and Kwon, Taesung and Ye, Jong Chul},
+  booktitle={Proceedings of the International Conference on Machine Learning (ICML)},
+  year={2026}
+} -->
+</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Website's visual design is inspired by <a href="https://dohunlee1.github.io/MemoryV2V/" target="_blank" rel="noopener">MemoryV2V</a>.
+    </p>
+  </footer>
+</body>
+</html>
