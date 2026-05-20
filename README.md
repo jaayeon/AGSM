@@ -5,7 +5,7 @@
 
 <p align="center">
         <a href=""><img src='https://img.shields.io/badge/arXiv-2411.15540-b31b1b.svg' alt='Paper PDF'></a>
-        <a href=''><img src='https://img.shields.io/badge/Project_Page-AGSM-green' alt='Project Page'></a>
+        <a href="https://jaayeon.github.io/AGSM/"><img src='https://img.shields.io/badge/Project_Page-AGSM-green' alt='Project Page'></a>
 </p>
 
 
