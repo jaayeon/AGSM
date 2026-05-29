@@ -4,7 +4,7 @@
 </h2>
 
 <p align="center">
-        <a href=""><img src='https://img.shields.io/badge/arXiv-2411.15540-b31b1b.svg' alt='Paper PDF'></a>
+        <a href="https://arxiv.org/abs/2605.30038"><img src='https://img.shields.io/badge/arXiv-2411.15540-b31b1b.svg' alt='Paper PDF'></a>
         <a href="https://jaayeon.github.io/AGSM/"><img src='https://img.shields.io/badge/Project_Page-AGSM-green' alt='Project Page'></a>
 </p>
 
@@ -24,6 +24,7 @@
 
 
 ## 🔥 News
+- [2026.05.29] Our paper is released on arXiv!
 
 - [2026.05.01] Our paper is accepted to ICML 2026 as a Spotlight!
 
@@ -43,6 +44,3 @@ To install requirements:
 Coming Soon
 ```
 
-
-## Acknowledgements
-This readme is motivated by [FlashWorld](https://github.com/imlixinyang/FlashWorld).
