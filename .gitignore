@@ -1,0 +1,40 @@
+__pycache__/
+*.py[cod]
+*.swp
+.DS_Store
+
+# Local environments
+.env
+.venv/
+venv/
+
+# Data and generated outputs
+data/
+data_ready/
+datasets/
+encodings*/
+outputs/
+runs/
+wandb/
+wandb_logs/
+log/
+logs/
+generated/
+edited/
+
+# Model/checkpoint artifacts
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.bin
+
+# Release AGSM token checkpoints
+!checkpoints/
+!checkpoints/**/
+!checkpoints/**/*.pth
+
+# Runtime logs
+*.out
+*.err
+*.log
