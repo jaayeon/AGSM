@@ -63,7 +63,11 @@
           </a>
           <a class="btn" href="https://github.com/jaayeon/AGSM" target="_blank" rel="noopener" aria-label="Code repository">
             <i class="fab fa-github" aria-hidden="true"></i>
-            <span>Code (Coming soon)</span>
+            <span>Code</span>
+          </a>
+          <a class="btn" href="https://huggingface.co/jaayeon/AGSM" target="_blank" rel="noopener" aria-label="Hugging Face checkpoints">
+            <i class="fas fa-database" aria-hidden="true"></i>
+            <span>Checkpoints</span>
           </a>
           <a class="btn" href="#BibTeX">
             <i class="ai ai-google-scholar" aria-hidden="true"></i>
@@ -77,9 +81,8 @@
       <div class="container">
         <h2 class="section-title">TL;DR</h2>
         <p class="tldr">
-          <span class="gradient-text">AGSM</span> is a lightweight, reward-free post-training method that improves text-image alignment in diffusion models.
-          The key design is a dual-token architecture that separates positive and negative alignment guidance during training.
-          AGSM improves semantic faithfulness, reduces counting errors, works across multiple backbones, and is complementary to RL post-training methods.
+          <span class="gradient-text">AGSM</span> is a lightweight, reward-free post-training method that improves text-image alignment without external rewards, denoising rollouts, or \(x_0\) approximation.
+          It learns dual positive/negative soft tokens from timestep-wise implicit rewards, improving semantic faithfulness across diffusion backbones.
         </p>
       </div>
     </section>
@@ -89,19 +92,19 @@
         <h2 class="section-title">Key Contributions</h2>
         <ul class="contribution-list">
           <li class="contribution-item">
-            <strong>Reward-free Plackett-Luce formulation.</strong> AGSM models text-image alignment as preference
-            learning over diffusion scores, avoiding external reward models.
+            <strong>Reward-free Plackett-Luce formulation.</strong>
+            AGSM models text-image alignment as preference learning over diffusion scores, deriving timestep-wise implicit rewards without external reward models.
           </li>
           <li class="contribution-item">
-            <strong>Explicit negative guidance.</strong> The method avoids unbounded contrastive divergence by
-            assigning bounded score-level directions to negative pairs.
+            <strong>No rollout or \(x_0\) approximation.</strong>
+            AGSM avoids full denoising trajectories and Tweedie-style reconstruction, sidestepping trajectory credit assignment by computing alignment rewards directly at each timestep.
           </li>
           <li class="contribution-item">
-            <strong>Dual token architecture.</strong>
-            AGSM separates positive and negative alignment regions with \(\psi^+\) and \(\psi^-\), preventing conflicting gradients from being absorbed into one shared token space.
+            <strong>Dual soft-token architecture.</strong>
+            AGSM freezes the backbone and separates positive and negative alignment regions with \(\psi^+\) and \(\psi^-\), preventing conflicting gradients from being absorbed into one shared token space.
           </li>
           <li class="contribution-item">
-            <strong>Efficiency and Versatility.</strong>
+            <strong>Efficiency and versatility.</strong>
             AGSM optimizes a small set of soft tokens (1.8M), works across multiple diffusion backbones, and can be combined with diffusion-RL post-training methods.
           </li>
 
